@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import COVER_IMAGE from "../../assets/6345765_24850.jpg";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
+import { useAuth } from "../authentication/service/AuthService";
+import axios from "axios";
+
 
 const UserProfile = () => {
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john@example.com");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
-  const [bio, setBio] = useState(
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-  );
+  const [bio, setBio] = useState("");
   const [rewardsEarned, setRewardsEarned] = useState(100);
   const [ongoingQuests, setOngoingQuests] = useState([
     { id: 1, title: "Explore Central Park", category: "Exploration" },
@@ -33,10 +34,67 @@ const UserProfile = () => {
     setQuestPreferences(filtered);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you can handle form submission, e.g., sending data to backend
+
+  let updated=false
+
+  const {token,message}=useAuth()
+  console.log("token->"+token)
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
   };
+  const reqBody={
+    "name":name,
+    "location":location,
+    "bio":bio,
+    "rewards":rewardsEarned,
+    "quest_preferences":questPreferences
+  }
+  useEffect(()=>{
+    console.log(name)
+    console.log(token)
+  },[token])
+  const handleUpdate= async()=>{
+  try{
+      const {message,user}= await axios.put('http://localhost:5000/auth/user/change_profile',reqBody,{
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+        })
+        console.log("UserProfile->"+message+" ->"+user)
+        updated=true
+    }
+    catch{
+     console.log("Cannot Change Profile")
+    }
+}
+  const getProfile= async()=>{
+    try{
+      const response= await axios.get('http://localhost:5000/auth/user/profile',{
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+        })
+        const obj=response.data[0]
+        setName(obj.name)
+        setLocation(obj.location)
+        setEmail(obj.email)
+        setBio(obj.bio)
+        setName(obj.name)
+        setRewardsEarned(obj.rewards)
+        setQuestPreferences(obj.quest_preferences)
+
+        console.log("GETProfile->"+obj.name)
+    }
+    catch{
+     console.log("Cannot get Profile")
+    }
+  }
+  useEffect(()=>{
+    getProfile()
+  },[updated])
 
   return (
     <div className="w-full h-full grid items-start p-10 bg-[#28282B]">
@@ -212,6 +270,7 @@ const UserProfile = () => {
               <button
                 type="submit"
                 className="mt-14 w-full bg-[#060606] rounded-full text-white border-2 border-black font-semibold p-4 my-2 hover:scale-105 hover:opacity-80 duration-300"
+                onClick={handleUpdate}
               >
                 Update Profile
               </button>

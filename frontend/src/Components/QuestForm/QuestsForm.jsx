@@ -1,31 +1,92 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import COVER_IMAGE from "../../assets/6345765_24850.jpg";
-import Select from 'react-select'
+import { toast } from 'react-toastify';
+import Select from "react-select";
+import PuffLoader from "react-spinners/PuffLoader";
+import { useAuth } from "../authentication/service/AuthService";
+import axios from "axios";
+
 
 const QuestsForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState([]);
   const [location, setLocation] = useState("");
-  const [duration, setDuration] = useState("");
+  const [duration, setDuration] = useState(0);
   const [difficulty, setDifficulty] = useState("");
-  const [rewards, setRewards] = useState("");
+  const [rewards, setRewards] = useState(1000);
   const [additionalInfo, setAdditionalInfo] = useState("");
+  const isLoggedin=localStorage.getItem('isLoggedin')
+  const token=localStorage.getItem('Token')
+  console.log("token->",token)
+  const params={
+    "title":title,
+    "description":description,
+    "category":category,
+    "additional_information":additionalInfo,
+    "location":location,
+    "difficulty":difficulty,
+    "duration":duration,
+    "rewards":rewards
+  }
+  const handleCategory=(e)=>{
+    // console.log("value->",e )
+    const a=[]
+    e.forEach((ev)=>a.push(ev.value))
+    setCategory(a)
+    
+  }  
+  console.log("newCategory->",category)
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Here you can handle form submission, e.g., sending data to backend
+
+  useEffect(()=>{
+    console.log("params->",params)
+  },[params])
+  const handleSubmit =async () => {
+    console.log("eneter the handleSubmit")
+    try{
+      const response=await axios.post('http://localhost:5000/jobs/createjob',params,{
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }})
+        console.log("Quest Form ->",response.data)
+        alert(response.data)
+      }catch{
+        console.log('Failed to Submit Form ')
+        alert('Failed to Submit Form ')
+      }
   };
+  // const json={
+  //   "name":title,
+  //   "description":description,
+  //   "category":category,
+  //   "additional_information":additionalInfo,
+  //   "location":location,
+  //   "difficulty":difficulty,
+  //   "duration":duration,
+  //   "wage":rewards
+  //  }
+  // }
+  
+
+
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, []);
 
   const options = [
-    { value: 'Exploration', label: 'Exploration' },
-    { value: 'Adventure', label: 'Adventure' },
-    { value: 'Art & Creativity', label: 'Art & Creativity' },
-    { value: 'Wellness', label: 'Wellness' },
-    { value: 'Nightlife & Entertainment', label: 'Nightlife & Entertainment' },
-    { value: 'Sports & Recreation', label: 'Sports & Recreation' },
-    { value: 'Local Events', label: 'Local Events' },
-  ]
+    { value: "Exploration", label: "Exploration" },
+    { value: "Adventure", label: "Adventure" },
+    { value: "Art & Creativity", label: "Art & Creativity" },
+    { value: "Wellness", label: "Wellness" },
+    { value: "Nightlife & Entertainment", label: "Nightlife & Entertainment" },
+    { value: "Sports & Recreation", label: "Sports & Recreation" },
+    { value: "Local Events", label: "Local Events" },
+  ];
 
   return (
     <div className="w-full h-full grid items-start p-10 bg-[#28282B]">
@@ -35,7 +96,7 @@ const QuestsForm = () => {
             <a href="/">Create a New Quest</a>
           </h1>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form className="space-y-4">
             <div>
               <label
                 htmlFor="title"
@@ -82,6 +143,7 @@ const QuestsForm = () => {
                 id="category"
                 required
                 isMulti
+                onChange={(e) => handleCategory(e)}
                 className="basic-multi-select my-2 cursor-pointer text-[17px]"
                 options={options}
               />
@@ -131,7 +193,6 @@ const QuestsForm = () => {
               </label>
               <select
                 id="difficulty"
-                value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value)}
                 className="w-full text-black my-2 bg-transparent border-b border-black outline-none focus:outline-none text-[17px]"
                 required
@@ -154,7 +215,7 @@ const QuestsForm = () => {
                 type="number"
                 id="duration"
                 value={duration}
-                onChange={(e) => setDuration(e.target.value)}
+                onChange={(e) => setDuration(Number(e.target.value))}
                 className="w-full text-black my-2 bg-transparent border-b border-black outline-none focus:outline-none text-[17px]"
                 required
               />
@@ -170,7 +231,7 @@ const QuestsForm = () => {
               <input
                 id="rewards"
                 value={rewards}
-                onChange={(e) => setRewards(e.target.value)}
+                onChange={(e) => setRewards(Number(e.target.value))}
                 className="w-full text-black my-2 bg-transparent border-b border-black outline-none focus:outline-none text-[17px]"
                 required
               />
@@ -180,8 +241,11 @@ const QuestsForm = () => {
               <button
                 type="submit"
                 className="mt-14 w-full bg-[#060606] rounded-full text-white border-2 border-black font-semibold p-4 my-2 hover:scale-105 hover:opacity-80 duration-300"
+                onClick={handleSubmit}
+
               >
-                Create Quest
+
+                  Create Quest
               </button>
             </div>
           </form>

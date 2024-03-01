@@ -1,10 +1,13 @@
-import React from "react";
+import React,{useEffect,useState} from "react";
 import COVER_IMAGE from "../../assets/scene.jpg";
 import { BsArrowLeftShort } from "react-icons/bs";
+import Aos from 'aos';
+import axios from 'axios';
+import { useParams } from "react-router-dom";
+
 
 const DetailsPage = () => {
-  // Dummy quest data (replace with actual quest data)
-  const quest = {
+  const ques = {
     title: "Explore Central Park",
     description:
       "Embark on a guided tour through the iconic Central Park, discovering its rich history, scenic landmarks, and hidden gems. This tour is perfect for nature enthusiasts, history buffs, and anyone looking to experience the beauty of one of New York City's most famous landmarks.",
@@ -31,6 +34,41 @@ const DetailsPage = () => {
     instructions:
       "Meet at the designated meeting point 15 minutes before the start time. Follow the guide's instructions throughout the tour. Be respectful of the park and fellow participants.",
   };
+  const [loading, setLoading] = useState(true);
+  const [quest, setDetails] = useState({});
+  const [companyDetails,setCompanyDetails]=useState({})
+  const job_id=useParams().job_id
+  let off;
+  let company_id;
+  useEffect(()=>{
+    Aos.init({duration: 2000})
+    console.log("job_id->",job_id.job_id)
+      const getDetails=async()=>{
+        try{
+          const response=await axios.get(`http://localhost:5000/jobs/get_job?job_id=${job_id}`)
+          off=response.data[0]
+          console.log("offdetails->",response.data[0])
+          company_id=off.company_id
+          console.log("company_id",company_id)
+          try{
+            const resp= await axios.get(`http://localhost:5000/auth/company/company_for_quest?id=${company_id}`)
+            setCompanyDetails(resp.data[0])
+            console.log("companyDetails->",resp.data[0])
+          }catch{
+            console.log("Cannot Get the Details of the company")
+          }
+          setDetails(off)
+        }catch{
+          console.log("Cannot get Details")
+        }
+        finally{
+          setLoading(false)
+        }
+      }
+      getDetails()
+      
+
+    },[])
 
   return (
     <div className="flex p-8 bg-[#28282B]">
@@ -73,11 +111,11 @@ const DetailsPage = () => {
               <ul className="list-disc list-inside">
                 <li>
                   <span className="font-semibold">Organizer:</span>{" "}
-                  {quest.organizer}
+                  {companyDetails.name}
                 </li>
                 <li>
                   <span className="font-semibold">Contact:</span>{" "}
-                  {quest.organizerContact}
+                  {companyDetails.email}
                 </li>
               </ul>
             </div>
@@ -85,7 +123,7 @@ const DetailsPage = () => {
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-2">Requirements</h3>
             <ul className="list-disc list-inside">
-              {quest.requirements.map((requirement, index) => (
+              {ques.requirements.map((requirement, index) => (
                 <li key={index}>{requirement}</li>
               ))}
             </ul>
@@ -93,14 +131,14 @@ const DetailsPage = () => {
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-2">Tasks Overview</h3>
             <ul className="list-disc list-inside">
-              {quest.tasksOverview.map((task, index) => (
+              {ques.tasksOverview.map((task, index) => (
                 <li key={index}>{task}</li>
               ))}
             </ul>
           </div>
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-2">Instructions</h3>
-            <p className="text-gray-800">{quest.instructions}</p>
+            <p className="text-gray-800">{ques.instructions}</p>
           </div>
           <div className="flex justify-center">
             <button className="text-[17px] py-3 px-6 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 hover:scale-105 scale-110">

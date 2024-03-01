@@ -3,7 +3,16 @@ import "./Popular.scss";
 import { BsArrowLeftShort } from "react-icons/bs";
 import { BsArrowRightShort } from "react-icons/bs";
 import { BsDot } from "react-icons/bs";
-import img from "../../assets/beautiful-peach-tree-blossom-japan.jpg";
+import img1 from "./../../assets/pic1.jpg";
+import img2 from "./../../assets/pic2.jpg";
+import img3 from "./../../assets/pic3.jpg";
+import img4 from "./../../assets/pic4.jpg";
+import img5 from "./../../assets/pic5.jpg";
+import img6 from "./../../assets/pic6.jpg";
+import img7 from "./../../assets/pic7.jpg";
+import img8 from "./../../assets/pic8.jpg";
+import img9 from "./../../assets/pic9.jpg";
+import img10 from "./../../assets/pic10.jpg";
 
 import Aos from "aos";
 import "aos/dist/aos.css";
@@ -11,108 +20,110 @@ import "aos/dist/aos.css";
 const Data = [
   {
     id: 1,
-    imgSrc: img,
+    imgSrc: img1,
     destTitle: "Scavenger Hunt",
-    location: "Peru",
+    location: "Hokkaido",
     grade:
       "A scavenger hunt quest where participants have to find specific landmarks or hidden items around the local area.",
   },
   {
     id: 2,
-    imgSrc: img,
+    imgSrc: img2,
     destTitle: "Photography Challenge",
-    location: "Mexico",
+    location: "Kyoto",
     grade:
       "Challenge participants to capture photos of iconic landmarks, beautiful scenery, or interesting street scenes.",
   },
   {
     id: 3,
-    imgSrc: img,
+    imgSrc: img3,
     destTitle: "Outdoor Yoga Session",
-    location: "Cambodia",
+    location: "Osaka",
     grade:
       "A quest where participants can join an outdoor yoga session in a scenic location such as a park or beach.",
   },
   {
     id: 4,
-    imgSrc: img,
+    imgSrc: img4,
     destTitle: "Local Cooking Class",
-    location: "India",
+    location: "Kusatsu",
     grade:
       "Offer a quest that involves participating in a cooking class to learn how to prepare traditional local dishes.",
   },
   {
     id: 5,
-    imgSrc: img,
+    imgSrc: img5,
     destTitle: "Art Workshop",
-    location: "India",
+    location: "Hakuba",
     grade:
       "An art workshop where participants can learn painting, pottery, or other creative activities from local artists.",
   },
   {
     id: 6,
-    imgSrc: img,
+    imgSrc: img6,
     destTitle: "Nature Walk",
-    location: "India",
+    location: "Kumano Kodo",
     grade:
       "A guided nature walk through local trails or parks, highlighting the flora, fauna, and natural beauty of the area.",
   },
   {
     id: 7,
-    imgSrc: img,
+    imgSrc: img7,
     destTitle: "Music Jam Session",
-    location: "India",
+    location: "Nara",
     grade:
       "A quest where participants can join a music jam session, either playing instruments or simply enjoying the music.",
   },
   {
     id: 8,
-    imgSrc: img,
+    imgSrc: img8,
     destTitle: "Sports Tournament",
-    location: "India",
+    location: "Tokyo",
     grade:
       "A friendly sports tournament such as beach volleyball, soccer, or basketball, encouraging friendly competition among participants.",
   },
   {
     id: 9,
-    imgSrc: img,
+    imgSrc: img9,
     destTitle: "Cultural Dance Class",
-    location: "India",
+    location: "Okinawa",
     grade:
       "A quest that involves learning traditional dances from the local culture, followed by a performance or social dance event.",
   },
   {
     id: 10,
-    imgSrc: img,
+    imgSrc: img10,
     destTitle: "Local Brewery or Winery Tour",
-    location: "India",
+    location: "Kanazawa",
     grade:
       "A tour of local breweries or wineries, where participants can learn about the production process and sample different beverages.",
   },
 ];
 
+const cardsPerPage = 4;
+
 const Popular = () => {
+
   useEffect(() => {
     Aos.init({ duration: 2000 });
   }, []);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const totalItems = 4;
+  const [currentIndex, setcurrentIndex] = useState(0);
+
+  const totalPages = Math.ceil(Data.length / cardsPerPage);
+  const startIndex = currentIndex * cardsPerPage;
+  const endIndex = startIndex + cardsPerPage;
 
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? totalItems - 1 : prevIndex - 1
-    );
+    setcurrentIndex((prevPage) => (prevPage === 0 ? totalPages - 1 : prevPage - 1));
   };
 
   const goToNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === totalItems - 1 ? 0 : prevIndex + 1
-    );
+    setcurrentIndex((prevPage) => (prevPage === totalPages - 1 ? 0 : prevPage + 1));
   };
 
   return (
-    <section className="popular section container">
+    <section className="popular section container" id="popular">
       <div className="secContainer">
         <div className="secHeader flex">
           <div
@@ -121,7 +132,7 @@ const Popular = () => {
             className="textDiv"
           >
             <h2 className="secTitle">Popular Activities</h2>
-            <p>
+            <p className="mt-2">
               From historical cities to natural specteculars, come see the best
               of the world!
             </p>
@@ -132,44 +143,37 @@ const Popular = () => {
             className="iconsDiv flex"
           >
             <button onClick={goToPrevious}>
-              <BsArrowLeftShort className="icon leftIcon"/>
+              <BsArrowLeftShort className="icon leftIcon" />
             </button>
             <button onClick={goToNext}>
               <BsArrowRightShort className="icon" />
             </button>
           </div>
         </div>
-
-        <div className="mainContent grid">
-          {Data.map(({ id, imgSrc, destTitle, location, grade }) => {
-            return (
-              <div data-aos="fade-up" className="singleDestination">
-                <div className="destImage">
-                  <img src={imgSrc} />
-
-                  <div className="overlayInfo">
-                    <h3>{destTitle}</h3>
-                    <p>{location}</p>
-                    <p className="mt-2">{grade}</p>
-                  </div>
-                </div>
-
-                <div className="destFooter">
-                  <div className="number">
-                    {`${id}` <= 9 ? `0${id}` : `${id}`}
-                  </div>
-                  <div className="destText flex">
-                    <h6>{location}</h6>
-                    <span className="flex">
-                      <span className="dot">
-                        <BsDot className="icon" />
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="mainContent grid mt-8">
+          
+        {Data.slice(startIndex, endIndex).map(({ id, imgSrc, destTitle, location, grade }, index) => (
+        <div key={id} data-aos="fade-up" className={`singleDestination ${index === currentIndex ? 'active' : ''}`}>
+          <div className="destImage">
+            <img src={imgSrc} />
+            <div className="overlayInfo">
+              <h3>{destTitle}</h3>
+              <p>{location}</p>
+              <p className="mt-2">{grade}</p>
+            </div>
+          </div>
+          <div className="destFooter">
+            <div className="number">{`${id <= 9 ? '0' : ''}${id}`}</div>
+            <div className="destText flex">
+              <h6>{location}</h6>
+              <span className="flex">
+                <span className="dot"><BsDot className="icon" /></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+          
         </div>
       </div>
     </section>
